@@ -1,0 +1,27 @@
+{
+  "name": "getit-and-react",
+  "version": "0.0.0",
+  "description": "getIt and React",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/williamcotton/getit-and-react.git"
+  },
+  "keywords": [
+    "mock",
+    "test",
+    "cache",
+    "functional",
+    "async",
+    "callback",
+    "retrieve"
+  ],
+  "author": "William Cotton",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/williamcotton/getit-and-react/issues"
+  }
+}
