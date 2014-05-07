@@ -64,6 +64,11 @@ waitForIt.MOCK = false; // or disable some mocks when the rest are global
 waitForIt.setMock = { // update the mock for custom testing
   waitedFor: 50000
 };
+waitForIt.MOCK = true;
+
+waitForIt(function(error, response) {
+  console.log("I waited for this mock amount of time: " response.waitedFor);
+});
 
 ```
 
