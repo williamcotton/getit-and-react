@@ -1,6 +1,8 @@
 getIt and React
 ===============
 
+[![TravisCI Build Status](https://travis-ci.org/williamcotton/getit-and-react.svg)](https://travis-ci.org/williamcotton/getit-and-react)
+
 getIt wraps your remote API calls providing inline mocks, timing functions, and more.
   
 The perfect companion for React. getIt and React. getIt?
