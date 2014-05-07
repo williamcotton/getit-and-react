@@ -58,11 +58,11 @@ var checkItFunction = function(retriever, mock) {
   return func;
 };
 
-var mockFunction = function(retriever, mock) {
+var mockFunction = function(retriever, mock, updateWith, opts) {
   
   var func = function() {
     if (typeof(func.MOCK) != "undefined" && !func.MOCK) {
-      return retrieverFunction(retriever, mock).apply(func, arguments);
+      return retrieverFunction(retriever, mock, updateWith, opts).apply(func, arguments);
     }
     if (func.setMock) {
       mock = func.setMock;
@@ -160,7 +160,7 @@ var getIt = function(retriever, mock, opts) {
   var func;
   var updateWith = {};
   if ((typeof(MOCK) != 'undefined' && MOCK) || (typeof(GLOBAL_MOCK) != 'undefined' && GLOBAL_MOCK)) {
-    func = mockFunction(retriever, mock);
+    func = mockFunction(retriever, mock, updateWith, opts);
   }
   else {
     func = retrieverFunction(retriever, mock, updateWith, opts);
