@@ -99,6 +99,18 @@ waitForIt.updateWith({
 });
 ```
 
+### getPreviousResponse
+
+Gets the callback response.
+
+This is useful for when you need to check the state from another source such as a listening function.
+
+```javacript
+
+waitForIt.getPreviousResponse().currentTime;
+
+```
+
 ### cacheStore
 
 Pass in a cacheStore that supports ```getItem(key)```, ```setItem(key, value)```, and ```removeItem(key)```.

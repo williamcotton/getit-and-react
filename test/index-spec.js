@@ -127,6 +127,15 @@ describe("getIt", function() {
     getTest.updateWith({sleepTime: 39});
   });
   
+  it("should get the last response", function(done) {
+    var time = 1;
+    getTest(time, function(error, res) {});
+    setTimeout(function() {
+      expect(getTest.getPreviousResponse().sleepTime).toBe(time);
+      done();
+    }, 7);
+  });
+  
   it("should update and merge with the previous response", function(done) {
     var responses = [];
     getTest(2, function(error, res) {

@@ -88,6 +88,10 @@ var mockFunction = function(retriever, mock, updateWith, opts) {
     mockUpdateWith.func(newResponse, opts);
   };
   
+  updateWith.getPreviousResponse = function() { 
+    return mockUpdateWith.getPreviousResponse();
+  };
+  
   return func;
 };
 
@@ -95,6 +99,7 @@ var retrieverFunction = function(retriever, mock, updateWith, opts) {
   var triggerCallback;
   var lastAppliedArgs;
   var triggerCount = 0;
+  var previousResponse;
   var func = function() {
     var callbackCount = 0;
     if (func.MOCK) {
@@ -109,12 +114,12 @@ var retrieverFunction = function(retriever, mock, updateWith, opts) {
       callback.apply(callback, triggerArgs);
     };
     var start = +new Date();
-    if (opts && opts.cacheStore && opts.cacheKey && opts.cacheStore.getItem && opts.cacheStore.getItem(opts.cacheKey)) {
-      var previousResponse = opts.cacheStore.getItem(opts.cacheKey);
+    if (opts && opts.cacheStore && opts.cacheKey && opts.cacheStore.getItem(opts.cacheKey)) {
+      var cachedResponse = opts.cacheStore.getItem(opts.cacheKey);
       var end = +new Date();
       var time = end - start;
-      previousResponse.retrievalTime = time;
-      callback.apply(callback, [true, previousResponse]);
+      cachedResponse.retrievalTime = time;
+      callback.apply(callback, [true, cachedResponse]);
       return;
     }
     var appliedArgs = args.slice(0, args.length-1);
@@ -129,7 +134,7 @@ var retrieverFunction = function(retriever, mock, updateWith, opts) {
       }
       var _appliedArgs = [_args[0]].concat(results);
       lastAppliedArgs = _appliedArgs;
-      var previousResponse = lastAppliedArgs[1];
+      previousResponse = lastAppliedArgs[1];
       if (opts && opts.cacheStore && opts.cacheKey) {
         opts.cacheStore.setItem(opts.cacheKey, previousResponse);
       }
@@ -149,6 +154,9 @@ var retrieverFunction = function(retriever, mock, updateWith, opts) {
     else {
       triggerCallback([true].concat(newResponse));
     }
+  };
+  updateWith.getPreviousResponse = function() {
+    return previousResponse;
   };
   return func;
 };
@@ -173,6 +181,7 @@ var getIt = function(retriever, mock, opts) {
     func = retrieverFunction(retriever, mock, updateWith, opts);
   }
   func.updateWith = updateWith.func;
+  func.getPreviousResponse = updateWith.getPreviousResponse;
   func.checkIt = checkItFunction(retriever, mock);
   return func;
 };
