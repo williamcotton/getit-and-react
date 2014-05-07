@@ -71,9 +71,10 @@ var retrieverFunction = function(retriever, mock) {
   return func;
 };
 
+var GLOBAL_MOCK;
 var getIt = function(retriever, mock) {
   var func;
-  if (typeof(MOCK) != 'undefined' && MOCK) {
+  if ((typeof(MOCK) != 'undefined' && MOCK) || (typeof(GLOBAL_MOCK) != 'undefined' && GLOBAL_MOCK)) {
     func = mockFunction(retriever, mock);
   }
   else {
@@ -83,5 +84,9 @@ var getIt = function(retriever, mock) {
   func.checkIt = checkItFunction(retriever, mock);
   return func;
 };
+
+getIt.SET_GLOBAL_MOCK = function(global_mock) {
+  GLOBAL_MOCK = global_mock;
+}
 
 module.exports = getIt;
