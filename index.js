@@ -10,12 +10,11 @@ var allTrue = function(array) {
     }
   });
   return all;
-}
+};
 
 var checkItFunction = function(retriever, mock) {
   
-  var check = function(response, mock, depth) {
-    var depth = depth || 0;
+  var check = function(response, mock) {
     if (isArray(response) && !isArray(mock)) {
       return false;
     }
@@ -33,7 +32,7 @@ var checkItFunction = function(retriever, mock) {
         var responseValue = response[mockKey];
         var responseHasValue = typeof(responseValue) != "undefined";
         allChecked.push(responseHasValue);
-        check(responseValue, mockValue, ++depth);
+        check(responseValue, mockValue);
       });
       if (!allTrue(allChecked)) {
         return false;
@@ -50,14 +49,14 @@ var checkItFunction = function(retriever, mock) {
       callback(true, {
         checked: check(response, mock)
       });
-    }
+    };
     appliedArgs.push(newCallback);
     retriever.apply(retriever, appliedArgs);    
     
 
   };
   return func;
-}
+};
 
 var mockFunction = function(retriever, mock) {
   
@@ -88,30 +87,33 @@ var mockFunction = function(retriever, mock) {
 var retrieverFunction = function(retriever, mock, updateWith, opts) {
   var triggerCallback;
   var lastAppliedArgs;
+  var triggerCount = 0;
   var func = function() {
+    var callbackCount = 0;
     if (func.MOCK) {
-      var mockFunc = mockFunction(retriever, mock)
+      var mockFunc = mockFunction(retriever, mock);
       mockFunc.setMock = func.setMock;
       return mockFunc.apply(func, arguments);
     }
     var args = Array.prototype.slice.call(arguments);
     var callback = args[args.length-1];
     triggerCallback = function(triggerArgs) {
+      ++triggerCount;
       callback.apply(callback, triggerArgs);
-    }
+    };
+    var start = +new Date();
     if (opts && opts.cacheStore && opts.cacheKey && opts.cacheStore.getItem && opts.cacheStore.getItem(opts.cacheKey)) {
-      var start = +new Date;
       var previousResponse = opts.cacheStore.getItem(opts.cacheKey);
-      var end = +new Date;
+      var end = +new Date();
       var time = end - start;
       previousResponse.retrievalTime = time;
       callback.apply(callback, [true, previousResponse]);
       return;
     }
     var appliedArgs = args.slice(0, args.length-1);
-    var start = +new Date;
     var newCallback = function() {
-      var end = +new Date;
+      ++callbackCount;
+      var end = +new Date();
       var time = end - start;
       var _args = Array.prototype.slice.call(arguments);
       var results = _args.slice(1, _args.length);
@@ -124,8 +126,8 @@ var retrieverFunction = function(retriever, mock, updateWith, opts) {
       if (opts && opts.cacheStore && opts.cacheKey) {
         opts.cacheStore.setItem(opts.cacheKey, previousResponse);
       }
-      triggerCallback(_appliedArgs);
-    }
+      callback.apply(callback, _appliedArgs);
+    };
     appliedArgs.push(newCallback);
     retriever.apply(retriever, appliedArgs);
   };
@@ -140,7 +142,7 @@ var retrieverFunction = function(retriever, mock, updateWith, opts) {
     else {
       triggerCallback([true].concat(newResponse));
     }
-  }
+  };
   return func;
 };
 
@@ -148,11 +150,10 @@ var cacheFunction = function(previousResponse) {
   var func = function() {
     var args = Array.prototype.slice.call(arguments);
     var callback = args[args.length-1];
-    var appliedArgs = args.slice(0, args.length-1);
     callback(true, previousResponse);
   };
   return func;
-}
+};
 
 var GLOBAL_MOCK;
 var getIt = function(retriever, mock, opts) {
@@ -171,6 +172,6 @@ var getIt = function(retriever, mock, opts) {
 
 getIt.SET_GLOBAL_MOCK = function(global_mock) {
   GLOBAL_MOCK = global_mock;
-}
+};
 
 module.exports = getIt;
