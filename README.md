@@ -52,7 +52,8 @@ waitForIt.checkIt(function(error, response) {
   }
 });
 
-waitForIt.updateIt({
+// calls all of the retriever function callbacks with a new object
+waitForIt.updateWith({
   currentTime: +new Date
 });
 

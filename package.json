@@ -27,5 +27,9 @@
   },
   "devDependencies": {
     "jasmine-node": "~1.14.3"
+  },
+  "dependencies": {
+    "isarray": "0.0.1",
+    "foreach": "~2.0.4"
   }
 }
