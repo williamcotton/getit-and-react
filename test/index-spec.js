@@ -52,4 +52,13 @@ describe("getIt", function() {
     });
   });
   
+  it("should be able to set a mock", function(done) {
+    getTest.setMock = {sleepTime: 12};
+    getTest.MOCK = true;
+    getTest(3, function(error, res) {
+      expect(res.sleepTime).toBe(12);
+      done();
+    });
+  });
+  
 });
