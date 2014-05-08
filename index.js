@@ -196,6 +196,11 @@ var getIt = function(retriever, mock, objState) {
   func.setMock = function(val){
     setMockData(retriever, val);
   };
+  func.clearCache = function() {
+    if (objState.cacheStore && objState.cacheStore.removeItem && objState.cacheKey) {
+      objState.cacheStore.removeItem(objState.cacheKey);
+    }
+  }
   return func;
 };
 

@@ -168,12 +168,12 @@ describe("getIt", function() {
   });
   
   it("should call the retriever and get a cached response", function(done) {
-    getTest = getIt(testRetriever, testMock, { cacheKey: "getTest", cacheStore: closureStorage });
+    var getTest1 = getIt(testRetriever, testMock, { cacheKey: "getTest1", cacheStore: closureStorage });
     var time = 30;
-    getTest(time, function(error, res) {
+    getTest1(time, function(error, res) {
       expect(res.sleepTime).toBe(time);
       var responses = [];
-      getTest(time, function(error, res) {
+      getTest1(time, function(error, res) {
         responses.push(res);
         if (responses.length == 1) {
           expect(res.retrievalTime).toBeLessThan(5);
@@ -187,13 +187,29 @@ describe("getIt", function() {
   });
   
   it("should call the retriever and only get a cached response", function(done) {
-    getTest = getIt(testRetriever, testMock, { cacheKey: "getTest2", cacheStore: closureStorage, cacheOnly:true });
+    var getTest2 = getIt(testRetriever, testMock, { cacheKey: "getTest2", cacheStore: closureStorage, cacheOnly:true });
     var time = 30;
-    getTest(time, function(error, res) {
+    getTest2(time, function(error, res) {
       expect(res.sleepTime).toBe(time);
-      getTest(time, function(error, res) {
+      getTest2(time, function(error, res) {
         expect(res.retrievalTime).toBeLessThan(5);
         done();
+      });
+    });
+  });
+  
+  it("should clear the cache", function(done) {
+    var getTest3 = getIt(testRetriever, testMock, { cacheKey: "getTest3", cacheStore: closureStorage, cacheOnly:true });
+    var time = 30;
+    getTest3(time, function(error, res) {
+      expect(res.retrievalTime).toBeGreaterThan(time-5);
+      getTest3(time, function(error, res) {
+        expect(res.retrievalTime).toBeLessThan(5);
+        getTest3.clearCache();
+        getTest3(time, function(error, res) {
+          expect(res.retrievalTime).toBeGreaterThan(time-5);
+          done();
+        });
       });
     });
   });
