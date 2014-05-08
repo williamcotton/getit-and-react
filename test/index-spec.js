@@ -186,4 +186,16 @@ describe("getIt", function() {
     });
   });
   
+  it("should call the retriever and only get a cached response", function(done) {
+    getTest = getIt(testRetriever, testMock, { cacheKey: "getTest2", cacheStore: closureStorage, cacheOnly:true });
+    var time = 30;
+    getTest(time, function(error, res) {
+      expect(res.sleepTime).toBe(time);
+      getTest(time, function(error, res) {
+        expect(res.retrievalTime).toBeLessThan(5);
+        done();
+      });
+    });
+  });
+  
 });

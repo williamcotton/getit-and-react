@@ -131,6 +131,9 @@ var retrieverFunction = function(retriever, mock, objState) {
       var time = end - start;
       cachedResponse.retrievalTime = time;
       callback.apply(callback, [true, cachedResponse]);
+      if (objState.cacheOnly) {
+        return;
+      }
     }
     var appliedArgs = args.slice(0, args.length-1);
     var newCallback = function() {
