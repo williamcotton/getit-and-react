@@ -57,14 +57,14 @@ Have fine-grained control over how your functions and modules are mocked.
 
 ```javascript
 
-MOCK = true; // global
-waitForIt.MOCK = true; // or per module
-waitForIt.MOCK = false; // or disable some mocks when the rest are global
+waitForIt.mock(true); // per module
+getIt.SET_GLOBAL_MOCK(true); // or global
+waitForIt.mock(false); // or disable some mocks when the rest are global
 
-waitForIt.setMock = { // update the mock for custom testing
+waitForIt.setMock({ // update the mock for custom testing
   waitedFor: 50000
-};
-waitForIt.MOCK = true;
+});
+waitForIt.mock(true);
 
 waitForIt(function(error, response) {
   console.log("I waited for this mock amount of time: " response.waitedFor);

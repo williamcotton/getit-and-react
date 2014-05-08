@@ -1,4 +1,5 @@
 var getIt = require("../index.js");
+getIt.SET_GLOBAL_MOCK(false);
 
 var _closureStore = {};
 var closureStorage = {
@@ -45,6 +46,7 @@ describe("getIt", function() {
   
   it("should call the retriever", function(done) {
     var time = 3;
+    getTest.mock(false);
     getTest(time, function(error, res) {
       expect(res.sleepTime).toBe(time);
       done();
@@ -52,7 +54,7 @@ describe("getIt", function() {
   });
   
   it("should call the mock", function(done) {
-    getTest.MOCK = true;
+    getTest.mock(true);
     var time = 3;
     getTest(time, function(error, res) {
       expect(res.sleepTime).not.toBe(time);
@@ -72,9 +74,9 @@ describe("getIt", function() {
   });
   
   it("should be able to set a mock", function(done) {
-    getTest.MOCK = true;
+    getTest.mock(true);
     var mockTime = 11;
-    getTest.setMock = {sleepTime: mockTime};
+    getTest.setMock({sleepTime: mockTime});
     getTest(3, function(error, res) {
       expect(res.sleepTime).toBe(mockTime);
       done();
@@ -116,6 +118,7 @@ describe("getIt", function() {
   
   it("should update the response", function(done) {
     var responses = [];
+    getTest.mock(false);
     getTest(7, function(error, res) {
       responses.push(res);
       if (responses.length == 2) {

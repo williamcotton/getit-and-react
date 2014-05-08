@@ -2,6 +2,10 @@ var isArray = require("isarray");
 var each = require("foreach");
 var hasOwn = Object.prototype.hasOwnProperty;
 
+var GLOBAL_MOCK;
+var GLOBAL_MOCK_STORE = {}
+var GLOBAL_MOCK_DATA_STORE = {};
+
 var allTrue = function(array) {
   var all = true;
   each(array, function(value) {
@@ -10,6 +14,26 @@ var allTrue = function(array) {
     }
   });
   return all;
+};
+
+var setMockData = function(retriever, setMock) {
+  var key = retriever.toString();
+  GLOBAL_MOCK_DATA_STORE[key] = setMock;
+};
+
+var getMockData = function(retriever) {
+  var key = retriever.toString();
+  return GLOBAL_MOCK_DATA_STORE[key];
+};
+
+var setMock = function(retriever, mock) {
+  var key = retriever.toString();
+  GLOBAL_MOCK_STORE[key] = mock;
+};
+
+var getMock = function(retriever) {
+  var key = retriever.toString();
+  return GLOBAL_MOCK_STORE[key];
 };
 
 var checkItFunction = function(retriever, mock) {
@@ -58,16 +82,12 @@ var checkItFunction = function(retriever, mock) {
   return func;
 };
 
-var mockFunction = function(retriever, mock, updateWith, opts) {
-  
-  var mockUpdateWith = {};
+var mockFunction = function(retriever, mock, objState) {
   
   var func = function() {
-    if (typeof(func.MOCK) != "undefined" && !func.MOCK) {
-      return retrieverFunction(retriever, mock, mockUpdateWith, opts).apply(func, arguments);
-    }
-    if (func.setMock) {
-      mock = func.setMock;
+
+    if (getMockData(retriever)) {
+      mock = getMockData(retriever);
     }
     var callback = arguments[arguments.length-1];
     var mockArgs;
@@ -84,27 +104,18 @@ var mockFunction = function(retriever, mock, updateWith, opts) {
     callback.apply(callback, mockArgs);
   };
   
-  updateWith.func = function(newResponse, opts) {
-    mockUpdateWith.func(newResponse, opts);
-  };
-  
-  updateWith.getPreviousResponse = function() { 
-    return mockUpdateWith.getPreviousResponse();
-  };
-  
   return func;
 };
 
-var retrieverFunction = function(retriever, mock, updateWith, opts) {
+var retrieverFunction = function(retriever, mock, objState) {
   var triggerCallback;
   var lastAppliedArgs;
   var triggerCount = 0;
   var previousResponse;
   var func = function() {
     var callbackCount = 0;
-    if (func.MOCK) {
-      var mockFunc = mockFunction(retriever, mock, updateWith, opts);
-      mockFunc.setMock = func.setMock;
+    if (getMock(retriever)) {
+      var mockFunc = mockFunction(retriever, mock, objState);
       return mockFunc.apply(func, arguments);
     }
     var args = Array.prototype.slice.call(arguments);
@@ -114,8 +125,8 @@ var retrieverFunction = function(retriever, mock, updateWith, opts) {
       callback.apply(callback, triggerArgs);
     };
     var start = +new Date();
-    if (opts && opts.cacheStore && opts.cacheKey && opts.cacheStore.getItem(opts.cacheKey)) {
-      var cachedResponse = opts.cacheStore.getItem(opts.cacheKey);
+    if (objState && objState.cacheStore && objState.cacheKey && objState.cacheStore.getItem(objState.cacheKey)) {
+      var cachedResponse = objState.cacheStore.getItem(objState.cacheKey);
       var end = +new Date();
       var time = end - start;
       cachedResponse.retrievalTime = time;
@@ -135,16 +146,16 @@ var retrieverFunction = function(retriever, mock, updateWith, opts) {
       var _appliedArgs = [_args[0]].concat(results);
       lastAppliedArgs = _appliedArgs;
       previousResponse = lastAppliedArgs[1];
-      if (opts && opts.cacheStore && opts.cacheKey) {
-        opts.cacheStore.setItem(opts.cacheKey, previousResponse);
+      if (objState && objState.cacheStore && objState.cacheKey) {
+        objState.cacheStore.setItem(objState.cacheKey, previousResponse);
       }
       callback.apply(callback, _appliedArgs);
     };
     appliedArgs.push(newCallback);
     retriever.apply(retriever, appliedArgs);
   };
-  updateWith.func = function(newResponse, opts) {
-    if (lastAppliedArgs && lastAppliedArgs[1] && opts && opts.merge) {
+  objState.updateWith = function(newResponse, objState) {
+    if (lastAppliedArgs && lastAppliedArgs[1] && objState && objState.merge) {
       var previousResponse = lastAppliedArgs[1];
       each(newResponse, function(value, key) {
         previousResponse[key] = value;
@@ -155,7 +166,7 @@ var retrieverFunction = function(retriever, mock, updateWith, opts) {
       triggerCallback([true].concat(newResponse));
     }
   };
-  updateWith.getPreviousResponse = function() {
+  objState.getPreviousResponse = function() {
     return previousResponse;
   };
   return func;
@@ -170,24 +181,28 @@ var cacheFunction = function(previousResponse) {
   return func;
 };
 
-var GLOBAL_MOCK;
-var getIt = function(retriever, mock, opts) {
-  var func;
-  var updateWith = {};
-  if ((typeof(MOCK) != 'undefined' && MOCK) || (typeof(GLOBAL_MOCK) != 'undefined' && GLOBAL_MOCK)) {
-    func = mockFunction(retriever, mock, updateWith, opts);
-  }
-  else {
-    func = retrieverFunction(retriever, mock, updateWith, opts);
-  }
-  func.updateWith = updateWith.func;
-  func.getPreviousResponse = updateWith.getPreviousResponse;
+var getIt = function(retriever, mock, objState) {
+  objState = objState || {};
+  objState.mock = GLOBAL_MOCK;
+  var func = retrieverFunction(retriever, mock, objState);
+  func.updateWith = objState.updateWith;
+  func.getPreviousResponse = objState.getPreviousResponse;
   func.checkIt = checkItFunction(retriever, mock);
+  func.mock = function(val){
+    setMock(retriever, val);
+  };
+  func.setMock = function(val){
+    setMockData(retriever, val);
+  };
   return func;
 };
 
 getIt.SET_GLOBAL_MOCK = function(global_mock) {
   GLOBAL_MOCK = global_mock;
+};
+
+getIt.GET_GLOBAL_MOCK = function() {
+  return GLOBAL_MOCK;
 };
 
 module.exports = getIt;
