@@ -50,6 +50,24 @@ describe("mocks", function() {
     });
   });
   
+  it("should not call getGlobalOne's retriever with getGlobalTwo's retriever and getGlobalThree's mock", function(done) {
+    
+    /*
+    
+      I'm guessing this has something to do with nesting async calls, but I'm really not sure!
+    
+    */
+    var input = 23;
+    getGlobalOne.mock(false);
+    getGlobalTwo.mock(false);
+    getGlobalThree.mock(true);
+    getGlobalOne(input, function(err, res) {
+      expect(res.input).toBe(input);
+      expect(res.globalTwo.globalThree).not.toBeDefined();
+      done();
+    });
+  });
+  
   it("should call getGlobalOne's mock", function(done) {
     var input = 23;
     getGlobalOne.mock(true);

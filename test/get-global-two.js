@@ -8,7 +8,7 @@ var getGlobalTwo = function(echo, callback) {
       callback(false, {
         echo: echo,
         globalThree: res
-      }, true);
+      });
     }, 3);
   });
 };

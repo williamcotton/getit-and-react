@@ -172,9 +172,16 @@ describe("getIt", function() {
     var time = 30;
     getTest(time, function(error, res) {
       expect(res.sleepTime).toBe(time);
+      var responses = [];
       getTest(time, function(error, res) {
-        expect(res.retrievalTime).toBe(0);
-        done();
+        responses.push(res);
+        if (responses.length == 1) {
+          expect(res.retrievalTime).toBeLessThan(5);
+        }
+        if (responses.length == 2) {
+          expect(res.retrievalTime).toBeGreaterThan(time-5);
+          done();
+        }
       });
     });
   });

@@ -8,7 +8,7 @@ var getGlobalOne = function(input, callback) {
       callback(false, {
         input: input,
         globalTwo: res
-      }, true);
+      });
     }, 5);
   });
 };
