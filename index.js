@@ -126,7 +126,7 @@ var retrieverFunction = function(retriever, mock, objState) {
     };
     var start = +new Date();
     if (objState && objState.cacheStore && objState.cacheKey && objState.cacheStore.getItem(objState.cacheKey)) {
-      var cachedResponse = objState.cacheStore.getItem(objState.cacheKey);
+      var cachedResponse = JSON.parse(objState.cacheStore.getItem(objState.cacheKey));
       var end = +new Date();
       var time = end - start;
       cachedResponse.retrievalTime = time;
@@ -146,7 +146,7 @@ var retrieverFunction = function(retriever, mock, objState) {
       lastAppliedArgs = _appliedArgs;
       previousResponse = lastAppliedArgs[1];
       if (objState && objState.cacheStore && objState.cacheKey) {
-        objState.cacheStore.setItem(objState.cacheKey, previousResponse);
+        objState.cacheStore.setItem(objState.cacheKey, JSON.stringify(previousResponse));
       }
       callback.apply(callback, _appliedArgs);
     };
