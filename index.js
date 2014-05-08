@@ -174,15 +174,6 @@ var retrieverFunction = function(retriever, mock, objState) {
   return func;
 };
 
-var cacheFunction = function(previousResponse) {
-  var func = function() {
-    var args = Array.prototype.slice.call(arguments);
-    var callback = args[args.length-1];
-    callback(true, previousResponse);
-  };
-  return func;
-};
-
 var getIt = function(retriever, mock, objState) {
   objState = objState || {};
   objState.mock = GLOBAL_MOCK;
