@@ -33,15 +33,13 @@
             var m = cache[name] = {exports:{}};
             var createDep = function(module, d) {
               var depId = module[1][d];
-              modules[depId][0](function(x){
-                  var id = modules[depId][1][x];
+              var _m = {exports:{},id:d};
+              var _dep = modules[depId];
+              _dep[0](function(x){
+                  var id = _dep[1][x];
                   return newRequire(id ? id : x);
-              }, m, m.exports);
-              var dep = {
-                id: d,
-                exports: m.exports
-              };
-              return dep;
+              }, _m, _m.exports,outer,modules,cache,entry);
+              return _m;
             }
             var module = modules[name];
             var children = [];

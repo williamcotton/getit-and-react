@@ -6,7 +6,7 @@ var prelude = fs.readFileSync(path.join(__dirname, 'prelude.js'), 'utf8');
 
 describe("browserify", function() {
   
-  it("should run", function(done) {
+  it("should support module.children with custom prelude", function(done) {
     
     var b = browserify(__dirname + '/entry.js');
     b.bundle({prelude: prelude}, function (err, src) {
