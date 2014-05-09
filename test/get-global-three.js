@@ -12,4 +12,10 @@ var mockThree = {
   ping: "pong"
 };
 
-module.exports = getIt(getGlobalThree, mockThree, {name: "getGlobalThree"});
+module.getItFunction = getGlobalThree;
+module.getItMock = mockThree;
+module.getItOptions = {
+  name: "getGlobalThree"
+};
+
+getIt.exportIt(module);

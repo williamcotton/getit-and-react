@@ -26,7 +26,9 @@
     "url": "https://github.com/williamcotton/getit-and-react/issues"
   },
   "devDependencies": {
-    "jasmine-node": "~1.14.3"
+    "jasmine-node": "~1.14.3",
+    "browserify": "~3.46.0",
+    "vm-browserify": "0.0.4"
   },
   "dependencies": {
     "isarray": "0.0.1",

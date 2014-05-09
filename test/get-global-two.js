@@ -17,4 +17,8 @@ var mockTwo = {
   echo: "echo"
 };
 
-module.exports = getIt(getGlobalTwo, mockTwo);
+module.getItFunction = getGlobalTwo;
+module.getItMock = mockTwo;
+module.getItOptions = {};
+
+getIt.exportIt(module);

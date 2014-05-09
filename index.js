@@ -2,6 +2,7 @@ var isArray = require("isarray");
 var each = require("foreach");
 var hasOwn = Object.prototype.hasOwnProperty;
 
+// global mocks should be deprecated...
 var GLOBAL_MOCK;
 var GLOBAL_MOCK_STORE = {}
 var GLOBAL_MOCK_DATA_STORE = {};
@@ -174,6 +175,13 @@ var retrieverFunction = function(retriever, mock, objState) {
   return func;
 };
 
+var exportIt = function(module) {
+  if (module.children) {
+    //console.log("module.children", module.children);
+  }
+  module.exports = getIt(module.getItFunction, module.getItMock, module.getItOptions);
+};
+
 var getIt = function(retriever, mock, objState) {
   objState = objState || {};
   objState.mock = GLOBAL_MOCK;
@@ -202,5 +210,7 @@ getIt.SET_GLOBAL_MOCK = function(global_mock) {
 getIt.GET_GLOBAL_MOCK = function() {
   return GLOBAL_MOCK;
 };
+
+getIt.exportIt = exportIt;
 
 module.exports = getIt;
