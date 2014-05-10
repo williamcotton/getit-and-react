@@ -39,6 +39,7 @@ var getMock = function(retriever) {
 
 var checkItFunction = function(retriever, mock) {
   
+  var allChecked = [];
   var check = function(response, mock) {
     if (isArray(response) && !isArray(mock)) {
       return false;
@@ -46,7 +47,7 @@ var checkItFunction = function(retriever, mock) {
     if (typeof(response) && !typeof(mock)) {
       return false;
     }
-    var allChecked = [];
+    
     if (typeof(response) == "object") {
       each(mock, function(mockValue, mockKey) {
         if (mockKey == 'retrievalTime') {
@@ -73,7 +74,9 @@ var checkItFunction = function(retriever, mock) {
     var appliedArgs = args.slice(0, args.length-1);
     var newCallback = function(err, response) {
       callback(false, {
-        checked: check(response, mock)
+        checked: check(response, mock),
+        response: response,
+        mock: mock
       });
     };
     appliedArgs.push(newCallback);

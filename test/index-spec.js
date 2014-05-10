@@ -116,6 +116,42 @@ describe("getIt", function() {
     });
   });
   
+  it("should check out fine with an array and it should make sure the elements match as well", function(done) {
+    var testRetrieverArray = function(callback) {
+      callback(true, [{
+        one: 1,
+        two: 2
+      }])
+    };
+    var testMockArray = [{
+      one: 1,
+      two: 2
+    }];
+    var getTestArray = getIt(testRetrieverArray, testMockArray);
+    getTestArray.checkIt(function(error, res) {
+      expect(res.checked).toBe(true);
+      done();
+    });
+  });
+  
+  it("should fail with an array mock where all the elements don't match", function(done) {
+    var testRetrieverArray = function(callback) {
+      callback(true, [{
+        one: 1,
+        two: 2
+      }])
+    };
+    var testMockArray = [{
+      one: 1,
+      three: 2
+    }];
+    var getTestArray = getIt(testRetrieverArray, testMockArray);
+    getTestArray.checkIt(function(error, res) {
+      expect(res.checked).not.toBe(true);
+      done();
+    });
+  });
+  
   it("should update the response", function(done) {
     var responses = [];
     getTest.mock(false);
