@@ -38,41 +38,44 @@ var getMock = function(retriever) {
 };
 
 var checkItFunction = function(retriever, mock) {
-  
-  var allChecked = [];
-  var check = function(response, mock) {
-    if (isArray(response) && !isArray(mock)) {
-      return false;
-    }
-    if (typeof(response) && !typeof(mock)) {
-      return false;
-    }
     
-    if (typeof(response) == "object") {
-      each(mock, function(mockValue, mockKey) {
-        if (mockKey == 'retrievalTime') {
-          return;
-        }
-        var responseValue = response[mockKey];
-        var responseHasKey = typeof(response[mockKey]) != "undefined";
-        allChecked.push(responseHasKey);
-        if (!responseHasKey) {
-          return false;
-        }
-        check(responseValue, mockValue);
-      });
-      if (!allTrue(allChecked)) {
-        return false;
-      }
-    }
-    return true;
-  };
-  
   var func = function() {
+    
     var args = Array.prototype.slice.call(arguments);
     var callback = args[args.length-1];
     var appliedArgs = args.slice(0, args.length-1);
     var newCallback = function(err, response) {
+      
+      var allChecked = [];
+
+      var check = function(response, mock) {
+        if (isArray(response) && !isArray(mock)) {
+          return false;
+        }
+        if (typeof(response) && !typeof(mock)) {
+          return false;
+        }
+
+        if (typeof(response) == "object") {
+          each(mock, function(mockValue, mockKey) {
+            if (mockKey == 'retrievalTime') {
+              return;
+            }
+            var responseValue = response[mockKey];
+            var responseHasKey = typeof(response[mockKey]) != "undefined";
+            allChecked.push(responseHasKey);
+            if (!responseHasKey) {
+              return false;
+            }
+            check(responseValue, mockValue);
+          });
+          if (!allTrue(allChecked)) {
+            return false;
+          }
+        }
+        return true;
+      };
+      
       callback(false, {
         checked: check(response, mock),
         response: response,
@@ -81,8 +84,6 @@ var checkItFunction = function(retriever, mock) {
     };
     appliedArgs.push(newCallback);
     retriever.apply(retriever, appliedArgs);    
-    
-
   };
   return func;
 };
