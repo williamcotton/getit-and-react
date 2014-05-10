@@ -4,7 +4,7 @@ var hasOwn = Object.prototype.hasOwnProperty;
 
 // global mocks should be deprecated...
 var GLOBAL_MOCK;
-var GLOBAL_MOCK_STORE = {}
+var GLOBAL_MOCK_STORE = {};
 var GLOBAL_MOCK_DATA_STORE = {};
 
 var allTrue = function(array) {
@@ -49,14 +49,15 @@ var checkItFunction = function(retriever, mock) {
     var allChecked = [];
     if (typeof(response) == "object") {
       each(mock, function(mockValue, mockKey) {
+        if (mockKey == 'retrievalTime') {
+          return;
+        }
+        var responseValue = response[mockKey];
         var responseHasKey = typeof(response[mockKey]) != "undefined";
         allChecked.push(responseHasKey);
         if (!responseHasKey) {
           return false;
         }
-        var responseValue = response[mockKey];
-        var responseHasValue = typeof(responseValue) != "undefined";
-        allChecked.push(responseHasValue);
         check(responseValue, mockValue);
       });
       if (!allTrue(allChecked)) {
@@ -71,7 +72,7 @@ var checkItFunction = function(retriever, mock) {
     var callback = args[args.length-1];
     var appliedArgs = args.slice(0, args.length-1);
     var newCallback = function(err, response) {
-      callback(true, {
+      callback(false, {
         checked: check(response, mock)
       });
     };
@@ -131,7 +132,7 @@ var retrieverFunction = function(retriever, mock, objState) {
       var end = +new Date();
       var time = end - start;
       cachedResponse.retrievalTime = time;
-      callback.apply(callback, [true, cachedResponse]);
+      callback.apply(callback, [false, cachedResponse]);
       if (objState.cacheOnly) {
         return;
       }
@@ -199,7 +200,7 @@ var getIt = function(retriever, mock, objState) {
     if (objState.cacheStore && objState.cacheStore.removeItem && objState.cacheKey) {
       objState.cacheStore.removeItem(objState.cacheKey);
     }
-  }
+  };
   return func;
 };
 
