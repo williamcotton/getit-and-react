@@ -17,6 +17,17 @@ var allTrue = function(array) {
   return all;
 };
 
+function isStorageSupported(storage) {
+  var testKey = 'test';
+  try {
+    storage.setItem(testKey, '1');
+    storage.removeItem(testKey);
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
+
 var setMockData = function(retriever, setMock) {
   var key = retriever.toString();
   GLOBAL_MOCK_DATA_STORE[key] = setMock;
@@ -131,7 +142,7 @@ var retrieverFunction = function(retriever, mock, objState) {
       callback.apply(callback, triggerArgs);
     };
     var start = +new Date();
-    if (objState && objState.cacheStore && objState.cacheKey && objState.cacheStore.getItem(objState.cacheKey)) {
+    if (objState && objState.cacheStore && objState.cacheKey && isStorageSupported(objState.cacheStore) && objState.cacheStore.getItem(objState.cacheKey)) {
       var cachedResponse = JSON.parse(objState.cacheStore.getItem(objState.cacheKey));
       var end = +new Date();
       var time = end - start;
@@ -154,7 +165,7 @@ var retrieverFunction = function(retriever, mock, objState) {
       var _appliedArgs = [_args[0]].concat(results);
       lastAppliedArgs = _appliedArgs;
       previousResponse = lastAppliedArgs[1];
-      if (objState && objState.cacheStore && objState.cacheKey) {
+      if (objState && objState.cacheStore && objState.cacheKey && isStorageSupported(objState.cacheStore)) {
         objState.cacheStore.setItem(objState.cacheKey, JSON.stringify(previousResponse));
       }
       callback.apply(callback, _appliedArgs);
@@ -201,7 +212,7 @@ var getIt = function(retriever, mock, objState) {
     setMockData(retriever, val);
   };
   func.clearCache = function() {
-    if (objState.cacheStore && objState.cacheStore.removeItem && objState.cacheKey) {
+    if (objState.cacheStore && objState.cacheStore.removeItem && isStorageSupported(objState.cacheStore) && objState.cacheKey) {
       objState.cacheStore.removeItem(objState.cacheKey);
     }
   };
